@@ -35,7 +35,7 @@ public class EnemyShooter : MonoBehaviour
     {
         Vector3 direction = (_target.position - transform.position).normalized;
         
-        GameObject newBullet = Instantiate(bullet.BulletPrefab, transform.position + direction, Quaternion.identity);
+        Bullet newBullet = Instantiate(bullet, transform.position + direction, Quaternion.identity);
         
         Rigidbody rigidbody = newBullet.GetComponent<Rigidbody>();
             
