@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class TargetMover : MonoBehaviour
 {
+    private const float PositionEpsilon = 0.0001f;
+    
     [SerializeField] private Transform _parentsOfTargets;
     [SerializeField] private Transform[] _targetPoints;
     
@@ -11,10 +13,10 @@ public class TargetMover : MonoBehaviour
 
     public void Update()
     {
-        Transform pointByNumberInArray = _targetPoints[_targetPositionIndex];
-        transform.position = Vector3.MoveTowards(transform.position , pointByNumberInArray.position, _speed * Time.deltaTime);
+        Transform targetPoint = _targetPoints[_targetPositionIndex];
+        transform.position = Vector3.MoveTowards(transform.position , targetPoint.position, _speed * Time.deltaTime);
 
-        if (transform.position == pointByNumberInArray.position)
+        if ((transform.position - targetPoint.position).sqrMagnitude < PositionEpsilon)
             ChangePoint();
     }
     
@@ -22,9 +24,8 @@ public class TargetMover : MonoBehaviour
     {
         _targetPositionIndex++;
 
-        if (_targetPositionIndex == _targetPoints.Length)
-            _targetPositionIndex  = 0;
-
+        _targetPositionIndex = (_targetPositionIndex + 1) % _targetPoints.Length;
+        
         Vector3 pointPosition = _targetPoints[_targetPositionIndex].transform.position;
         transform.forward = pointPosition - transform.position;
         
