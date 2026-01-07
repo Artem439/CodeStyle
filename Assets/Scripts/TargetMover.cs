@@ -20,16 +20,12 @@ public class TargetMover : MonoBehaviour
             ChangePoint();
     }
     
-    private Vector3 ChangePoint()
+    private void ChangePoint()
     {
-        _targetPositionIndex++;
-
         _targetPositionIndex = (_targetPositionIndex + 1) % _targetPoints.Length;
         
         Vector3 pointPosition = _targetPoints[_targetPositionIndex].transform.position;
         transform.forward = pointPosition - transform.position;
-        
-        return pointPosition;
     }
     
 #if UNITY_EDITOR
@@ -39,7 +35,7 @@ public class TargetMover : MonoBehaviour
         _targetPoints = new Transform[_parentsOfTargets.childCount];
 
         for (int i = 0; i < _parentsOfTargets.childCount; i++)
-            _targetPoints[i] = _parentsOfTargets.GetChild(i).GetComponent<Transform>();
+            _targetPoints[i] = _parentsOfTargets.GetChild(i);
     }
 #endif
 }
