@@ -37,8 +37,8 @@ public class EnemyShooter : MonoBehaviour
         
         Bullet newBullet = Instantiate(bullet, transform.position + direction, Quaternion.identity);
         
-        Rigidbody rigidbody = newBullet.GetComponent<Rigidbody>();
-            
+        Rigidbody rigidbody = newBullet.Rigidbody;
+        
         rigidbody.transform.up = direction;
         rigidbody.velocity = direction * _speed;
     }

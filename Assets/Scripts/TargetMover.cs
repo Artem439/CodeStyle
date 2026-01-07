@@ -1,59 +1,44 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class TargetMover : MonoBehaviour
 {
-    [SerializeField] private List<Transform> _targetPoints;
-    [SerializeField] private float _speed = 2f;
-    [SerializeField] private float _reachDistance = 0.2f;
+    [SerializeField] private Transform _parentsOfTargets;
+    [SerializeField] private Transform[] _targetPoints;
+    
+    [SerializeField] private float _speed;
     
     private int _targetPositionIndex;
-    private Vector3 _targetPosition;
-    
-     private void Start()
-    {
-        if (_targetPoints == null || _targetPoints.Count == 0)
-        {
-            Debug.LogError($"{name}: Target points list is empty");
-            enabled = false;
-            return;
-        }
 
-        _targetPositionIndex = 0;
-        SetTargetPosition();
+    public void Update()
+    {
+        Transform pointByNumberInArray = _targetPoints[_targetPositionIndex];
+        transform.position = Vector3.MoveTowards(transform.position , pointByNumberInArray.position, _speed * Time.deltaTime);
+
+        if (transform.position == pointByNumberInArray.position)
+            ChangePoint();
     }
     
-    private void Update()
+    private Vector3 ChangePoint()
     {
-        UpdateTarget();
+        _targetPositionIndex++;
+
+        if (_targetPositionIndex == _targetPoints.Length)
+            _targetPositionIndex  = 0;
+
+        Vector3 pointPosition = _targetPoints[_targetPositionIndex].transform.position;
+        transform.forward = pointPosition - transform.position;
         
-        Move();
-    }
-
-    private void Move()
-    {
-        Vector3 nextPosition = Vector3.MoveTowards(transform.position , _targetPosition, _speed * Time.deltaTime);
-        
-        nextPosition.y = transform.position.y;
-        transform.position = nextPosition;
-    }
-
-    private void UpdateTarget()
-    {
-        Vector2 currentXZ = new Vector2(transform.position.x, transform.position.z);
-        Vector2 targetXZ = new Vector2(_targetPosition.x, _targetPosition.z);
-
-        if (Vector2.Distance(currentXZ, targetXZ) <= _reachDistance)
-        {
-            _targetPositionIndex = (_targetPositionIndex + 1) % _targetPoints.Count;
-            SetTargetPosition();
-        }
+        return pointPosition;
     }
     
-    private void SetTargetPosition()
+#if UNITY_EDITOR
+    [ContextMenu("Refresh Target Points")]
+    private void RefreshTargetPoints()
     {
-        Vector3 pointPosition = _targetPoints[_targetPositionIndex].position;
+        _targetPoints = new Transform[_parentsOfTargets.childCount];
 
-        _targetPosition = new Vector3(pointPosition.x, transform.position.y, pointPosition.z);
+        for (int i = 0; i < _parentsOfTargets.childCount; i++)
+            _targetPoints[i] = _parentsOfTargets.GetChild(i).GetComponent<Transform>();
     }
+#endif
 }
